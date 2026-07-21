@@ -10,6 +10,10 @@ source /project/3dllms/melgin/conda/etc/profile.d/conda.sh
 conda env create -f environment.yml   # creates gpt-oss-scoring
 # or: conda activate gpt-oss-scoring  # if already created
 
+# Important: keep transformers==4.56.1 (vLLM 0.10.1.1 breaks on transformers 5.x).
+# If the env already exists and scoring fails on all_special_tokens_extended:
+#   conda activate gpt-oss-scoring && pip install 'transformers==4.56.1'
+
 # Download weights (~61G MXFP4) into ./models/gpt-oss-120b
 chmod +x scripts/download_gpt_oss_120b.sh
 ./scripts/download_gpt_oss_120b.sh
