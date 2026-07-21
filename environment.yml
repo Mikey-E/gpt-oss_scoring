@@ -1,0 +1,12 @@
+name: gpt-oss-scoring
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - vllm==0.10.1.1
+      - openai-harmony
+      - transformers
+      - torch
+      - huggingface_hub
