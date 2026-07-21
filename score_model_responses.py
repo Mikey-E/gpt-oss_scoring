@@ -265,7 +265,27 @@ def resolve_vllm_memory_settings(args: argparse.Namespace) -> dict:
     return settings
 
 
+def configure_cuda_multiprocessing() -> None:
+    """Avoid CUDA-in-fork failures when vLLM starts TP workers.
+
+    Importing torch/vLLM can register deferred CUDA capability checks. With the
+    default fork start method, workers then crash with errors like:
+      device=3, num_gpus=3
+      Cannot re-initialize CUDA in forked subprocess
+    """
+    os.environ.setdefault("CUDA_DEVICE_ORDER", "PCI_BUS_ID")
+    os.environ.setdefault("VLLM_WORKER_MULTIPROC_METHOD", "spawn")
+    import multiprocessing as mp
+
+    try:
+        mp.set_start_method("spawn", force=True)
+    except RuntimeError:
+        # Start method may already be set; spawn env var still guides vLLM.
+        pass
+
+
 def load_llm(args: argparse.Namespace):
+    configure_cuda_multiprocessing()
     from vllm import LLM
 
     model_path = Path(args.model_path).resolve()
@@ -277,6 +297,11 @@ def load_llm(args: argparse.Namespace):
     tp = resolve_tensor_parallel_size(args.tensor_parallel_size)
     mem = resolve_vllm_memory_settings(args)
     print(f"Loading vLLM model from {model_path} (tensor_parallel_size={tp})")
+    print(
+        "CUDA_VISIBLE_DEVICES="
+        f"{os.environ.get('CUDA_VISIBLE_DEVICES', '')!r} "
+        f"VLLM_WORKER_MULTIPROC_METHOD={os.environ.get('VLLM_WORKER_MULTIPROC_METHOD')}"
+    )
     return LLM(
         model=str(model_path),
         tensor_parallel_size=tp,

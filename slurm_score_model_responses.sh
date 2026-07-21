@@ -138,6 +138,10 @@ if ! command -v nvidia-smi >/dev/null 2>&1 || ! nvidia-smi -L >/dev/null 2>&1; t
     exit 1
 fi
 
+# Prefer spawn for vLLM TP workers (avoids CUDA fork / deferred-init crashes).
+export CUDA_DEVICE_ORDER="${CUDA_DEVICE_ORDER:-PCI_BUS_ID}"
+export VLLM_WORKER_MULTIPROC_METHOD="${VLLM_WORKER_MULTIPROC_METHOD:-spawn}"
+
 CONDA_SH="${CONDA_INSTALL_PATH:-/project/3dllms/melgin/conda}/etc/profile.d/conda.sh"
 if [[ ! -f "$CONDA_SH" ]]; then
     echo "ERROR: conda.sh not found at $CONDA_SH" >&2
@@ -153,6 +157,7 @@ mkdir -p slurm_logs
 echo "Host: $(hostname)"
 echo "SLURM_JOB_ID=${SLURM_JOB_ID}"
 echo "CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-}"
+echo "VLLM_WORKER_MULTIPROC_METHOD=${VLLM_WORKER_MULTIPROC_METHOD}"
 nvidia-smi -L || true
 
 CMD=(
