@@ -20,7 +20,24 @@
 
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Slurm copies the batch script into /var/spool/slurmd/job*/; BASH_SOURCE then
+# points there, so fall back to SLURM_SUBMIT_DIR (cwd at sbatch time).
+resolve_repo_root() {
+    local candidate
+    candidate="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [[ -f "${candidate}/score_model_responses.py" ]]; then
+        printf '%s\n' "$candidate"
+        return 0
+    fi
+    if [[ -n "${SLURM_SUBMIT_DIR:-}" && -f "${SLURM_SUBMIT_DIR}/score_model_responses.py" ]]; then
+        printf '%s\n' "$SLURM_SUBMIT_DIR"
+        return 0
+    fi
+    echo "Error: cannot locate gpt-oss_scoring repo root (tried ${candidate} and SLURM_SUBMIT_DIR=${SLURM_SUBMIT_DIR:-unset})" >&2
+    return 1
+}
+
+ROOT="$(resolve_repo_root)" || exit 1
 # shellcheck source=scripts/partition_defaults.sh
 source "${ROOT}/scripts/partition_defaults.sh"
 
