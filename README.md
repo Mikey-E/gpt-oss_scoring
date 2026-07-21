@@ -59,4 +59,5 @@ Optional `--output <dir>` overrides the default output location.
 - Empty model responses are scored `F` without a model call.
 - `--answer_key` is required. It is applied for filenames ending in `standard.json` or containing `_aad_`, `_iasd_`, or `_oe_solvable`; other files use “unanswerable / none of the above”.
 - Invalid non-`T`/`F` outputs are retried (up to 5 attempts). Persistent failure writes `FAILED_*_oss120_scored.json`.
+- vLLM memory knobs auto-tune by GPU size (A30 is tight for 120B): lower `max_num_seqs` / `max_model_len`, and `enforce_eager` on ≤24GB GPUs. Override with `--max-num-seqs`, `--max-model-len`, `--gpu-memory-utilization`, `--enforce-eager` / `--no-enforce-eager`.
 - Logs: `./slurm_logs/score_oss120_<jobid>.out`

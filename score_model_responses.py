@@ -120,8 +120,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--gpu-memory-utilization",
         type=float,
-        default=0.95,
-        help="vLLM GPU memory utilization (default: 0.95).",
+        default=None,
+        help="vLLM GPU memory utilization (default: auto by GPU size).",
     )
     parser.add_argument(
         "--max-tokens",
@@ -138,8 +138,20 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--max-model-len",
         type=int,
-        default=4096,
-        help="vLLM max model length (default: 4096 for short scoring prompts).",
+        default=None,
+        help="vLLM max model length (default: auto by GPU size).",
+    )
+    parser.add_argument(
+        "--max-num-seqs",
+        type=int,
+        default=None,
+        help="vLLM max concurrent sequences (default: auto by GPU size).",
+    )
+    parser.add_argument(
+        "--enforce-eager",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Disable CUDA graphs (default: auto; enabled on <=24GB GPUs).",
     )
     return parser.parse_args()
 
@@ -153,6 +165,78 @@ def resolve_tensor_parallel_size(cli_value: int | None) -> int:
     return 1
 
 
+def detect_gpu_memory_gib() -> float:
+    """Return GiB of GPU 0, or a conservative fallback if CUDA is unavailable."""
+    try:
+        import torch
+
+        if torch.cuda.is_available():
+            return torch.cuda.get_device_properties(0).total_memory / (1024**3)
+    except Exception:
+        pass
+    return 24.0
+
+
+def resolve_vllm_memory_settings(args: argparse.Namespace) -> dict:
+    """
+    Choose vLLM memory knobs from GPU size.
+
+    A30 (24GB) is tight for gpt-oss-120b TP=4: weights alone leave little room,
+    so concurrent seqs / context / CUDA graphs must be constrained.
+    """
+    gpu_mem = detect_gpu_memory_gib()
+
+    if gpu_mem < 30:
+        # A30-class 24GB
+        defaults = {
+            "gpu_memory_utilization": 0.90,
+            "max_model_len": 2048,
+            "max_num_seqs": 16,
+            "enforce_eager": True,
+        }
+    elif gpu_mem < 60:
+        # L40S-class 48GB
+        defaults = {
+            "gpu_memory_utilization": 0.92,
+            "max_model_len": 4096,
+            "max_num_seqs": 64,
+            "enforce_eager": False,
+        }
+    else:
+        # H100-class 80GB+
+        defaults = {
+            "gpu_memory_utilization": 0.95,
+            "max_model_len": 4096,
+            "max_num_seqs": 128,
+            "enforce_eager": False,
+        }
+
+    settings = {
+        "gpu_memory_utilization": (
+            args.gpu_memory_utilization
+            if args.gpu_memory_utilization is not None
+            else defaults["gpu_memory_utilization"]
+        ),
+        "max_model_len": (
+            args.max_model_len if args.max_model_len is not None else defaults["max_model_len"]
+        ),
+        "max_num_seqs": (
+            args.max_num_seqs if args.max_num_seqs is not None else defaults["max_num_seqs"]
+        ),
+        "enforce_eager": (
+            args.enforce_eager if args.enforce_eager is not None else defaults["enforce_eager"]
+        ),
+    }
+    print(
+        f"GPU0 memory ≈ {gpu_mem:.1f} GiB; vLLM settings: "
+        f"gpu_memory_utilization={settings['gpu_memory_utilization']}, "
+        f"max_model_len={settings['max_model_len']}, "
+        f"max_num_seqs={settings['max_num_seqs']}, "
+        f"enforce_eager={settings['enforce_eager']}"
+    )
+    return settings
+
+
 def load_llm(args: argparse.Namespace):
     from vllm import LLM
 
@@ -163,13 +247,18 @@ def load_llm(args: argparse.Namespace):
         )
 
     tp = resolve_tensor_parallel_size(args.tensor_parallel_size)
+    mem = resolve_vllm_memory_settings(args)
     print(f"Loading vLLM model from {model_path} (tensor_parallel_size={tp})")
     return LLM(
         model=str(model_path),
         tensor_parallel_size=tp,
         trust_remote_code=True,
-        gpu_memory_utilization=args.gpu_memory_utilization,
-        max_model_len=args.max_model_len,
+        gpu_memory_utilization=mem["gpu_memory_utilization"],
+        max_model_len=mem["max_model_len"],
+        max_num_seqs=mem["max_num_seqs"],
+        enforce_eager=mem["enforce_eager"],
+        # PCIe multi-GPU nodes (A30/L40S) cannot use custom allreduce for TP>2.
+        disable_custom_all_reduce=(tp > 2),
     )
 
 
