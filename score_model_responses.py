@@ -43,10 +43,22 @@ def normalize_score(text: str) -> str:
     text = extract_final_answer(text).strip()
     if text in {"T", "F"}:
         return text
-    # Accept a lone T/F even if surrounded by whitespace/punctuation.
-    match = re.search(r"\b([TtFf])\b", text)
+
+    # vLLM often strips special tokens, leaving e.g. "analysis...assistantfinalF".
+    match = re.search(r"assistantfinal\s*([TtFf])\s*$", text)
     if match:
         return match.group(1).upper()
+    match = re.search(r"(?:^|[\s>])final\s*([TtFf])\s*$", text, re.IGNORECASE)
+    if match:
+        return match.group(1).upper()
+
+    # Prefer the last standalone T/F (final answer is usually last).
+    matches = list(re.finditer(r"(?<![A-Za-z0-9_])([TtFf])(?![A-Za-z0-9_])", text))
+    if matches:
+        return matches[-1].group(1).upper()
+
+    if text[-1:].upper() in {"T", "F"}:
+        return text[-1].upper()
     if text.upper() in {"T", "F"}:
         return text.upper()
     return text
@@ -126,7 +138,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--max-tokens",
         type=int,
-        default=128,
+        default=256,
         help="Max new tokens per score (includes low reasoning + final T/F).",
     )
     parser.add_argument(
@@ -166,12 +178,28 @@ def resolve_tensor_parallel_size(cli_value: int | None) -> int:
 
 
 def detect_gpu_memory_gib() -> float:
-    """Return GiB of GPU 0, or a conservative fallback if CUDA is unavailable."""
-    try:
-        import torch
+    """
+    Return GiB of the first visible GPU without initializing CUDA in-process.
 
-        if torch.cuda.is_available():
-            return torch.cuda.get_device_properties(0).total_memory / (1024**3)
+    Calling torch.cuda before vLLM can break multiproc workers with:
+    'Cannot re-initialize CUDA in forked subprocess'.
+    """
+    try:
+        import subprocess
+
+        out = subprocess.check_output(
+            [
+                "nvidia-smi",
+                "--query-gpu=memory.total",
+                "--format=csv,noheader,nounits",
+            ],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+        lines = [ln.strip() for ln in out.splitlines() if ln.strip()]
+        if lines:
+            # nvidia-smi reports MiB
+            return float(lines[0]) / 1024.0
     except Exception:
         pass
     return 24.0
