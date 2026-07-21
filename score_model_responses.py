@@ -398,54 +398,30 @@ def main() -> int:
     if to_score_ids:
         llm = load_llm(args)
 
-        # First pass: batch everything for throughput.
+        # Single greedy pass (temperature=0). Retries would repeat the same tokens.
         scores = score_batch(llm, to_score_prompts, args)
-        pending_retry_ids: list[str] = []
-        pending_retry_prompts: list[str] = []
+        invalid_ids: list[str] = []
+        invalid_texts: dict[str, str] = {}
 
-        last_invalid_scores: dict[str, str] = {}
-        for point_cloud, prompt, score in zip(to_score_ids, to_score_prompts, scores):
+        for point_cloud, score in zip(to_score_ids, scores):
             if score in {"T", "F"}:
                 data[point_cloud]["score"] = score
             else:
-                last_invalid_scores[point_cloud] = score
-                pending_retry_ids.append(point_cloud)
-                pending_retry_prompts.append(prompt)
-                print(f"Invalid score '{score}' for {point_cloud}; will retry")
+                invalid_ids.append(point_cloud)
+                invalid_texts[point_cloud] = score
+                data[point_cloud]["score"] = score
+                print(f"Invalid score '{score}' for {point_cloud}")
 
-        # Retries for invalid outputs (up to MAX_ATTEMPTS total attempts including first).
-        attempt = 1
-        while pending_retry_ids and attempt < MAX_ATTEMPTS:
-            attempt += 1
-            print(f"Retry attempt {attempt}/{MAX_ATTEMPTS} for {len(pending_retry_ids)} items")
-            retry_scores = score_batch(llm, pending_retry_prompts, args)
-            next_ids: list[str] = []
-            next_prompts: list[str] = []
-            for point_cloud, prompt, score in zip(
-                pending_retry_ids, pending_retry_prompts, retry_scores
-            ):
-                if score in {"T", "F"}:
-                    data[point_cloud]["score"] = score
-                else:
-                    last_invalid_scores[point_cloud] = score
-                    next_ids.append(point_cloud)
-                    next_prompts.append(prompt)
-                    print(f"Invalid score '{score}' for {point_cloud} on attempt {attempt}")
-            pending_retry_ids = next_ids
-            pending_retry_prompts = next_prompts
-
-        if pending_retry_ids:
+        if invalid_ids:
             scoring_failed = True
-            failed_id = pending_retry_ids[0]
-            failed_text = last_invalid_scores.get(failed_id, data.get(failed_id, {}).get("score", ""))
-            data[failed_id]["score"] = failed_text
-            for point_cloud in pending_retry_ids:
-                data[point_cloud]["score"] = last_invalid_scores.get(
-                    point_cloud, data.get(point_cloud, {}).get("score", "")
-                )
+            failed_id = invalid_ids[0]
+            failed_text = invalid_texts[failed_id]
             print(f"ERROR: Invalid score '{failed_text}' for {failed_id}")
             print("Expected 'T' or 'F'")
-            print("Stopping scoring and saving with FAILED_ prefix")
+            print(
+                f"{len(invalid_ids)} item(s) did not yield T/F under greedy decoding; "
+                "saving with FAILED_ prefix (retries omitted because temperature=0)."
+            )
 
     output_dir = Path(args.output_dir).resolve() if args.output_dir else default_output_dir(json_file)
     output_dir.mkdir(parents=True, exist_ok=True)
