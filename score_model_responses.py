@@ -13,7 +13,6 @@ from pathlib import Path
 SCORING_MODEL_TAG = "oss120"
 DEFAULT_MODEL_PATH = Path(__file__).resolve().parent / "models" / "gpt-oss-120b"
 DEFAULT_PROMPT_PATH = Path(__file__).resolve().parent / "scoring_prompt.txt"
-MAX_ATTEMPTS = 5
 
 
 def filename_uses_answer_key(path: str | Path) -> bool:
