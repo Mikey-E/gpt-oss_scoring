@@ -4,7 +4,8 @@
 #   ./multi-slurm_score_model_responses.sh <directory> \
 #     --partition h100 \
 #     --answer_key <answer_key.json> \
-#     [--output <output_dir>]
+#     [--output <output_dir>] \
+#     [--reasoning low|medium|high]
 #
 # Notes:
 #   - For each *.json file directly inside <directory>, submits one job.
@@ -14,6 +15,7 @@
 #     with the unanswerable/none-of-the-above correct answer.
 #   - Non-JSON files are ignored. Subdirectories are not traversed.
 #   - --partition accepts a30|l40s|h100 or mb-a30|mb-l40s|mb-h100.
+#   - --reasoning defaults to low if omitted (same as score_model_responses.py).
 
 set -uo pipefail
 
@@ -31,7 +33,7 @@ die() {
 }
 
 usage() {
-    echo "Usage: $0 <directory> --partition <a30|l40s|h100|mb-*> --answer_key <answer_key.json> [--output <dir>]" >&2
+    echo "Usage: $0 <directory> --partition <a30|l40s|h100|mb-*> --answer_key <answer_key.json> [--output <dir>] [--reasoning low|medium|high]" >&2
 }
 
 main() {
@@ -44,6 +46,7 @@ main() {
     local ANSWER_KEY=""
     local PARTITION_ARG=""
     local OUTPUT_DIR=""
+    local REASONING=""
 
     while [ $# -gt 0 ]; do
         case "$1" in
@@ -60,6 +63,18 @@ main() {
             --output|--output-dir)
                 [ -n "${2:-}" ] || { die "--output requires a path"; return 1; }
                 OUTPUT_DIR="$2"
+                shift 2
+                ;;
+            --reasoning)
+                [ -n "${2:-}" ] || { die "--reasoning requires low|medium|high"; return 1; }
+                case "$2" in
+                    low|medium|high) ;;
+                    *)
+                        die "--reasoning must be low, medium, or high (got: $2)"
+                        return 1
+                        ;;
+                esac
+                REASONING="$2"
                 shift 2
                 ;;
             -*)
@@ -97,6 +112,9 @@ main() {
     echo "Submitting scoring jobs for JSON files in: $TARGET_DIR" >&2
     echo "Answer key: $ANSWER_KEY" >&2
     echo "Partition: ${RESOLVED_PARTITION} (${RESOLVED_GPUS} GPUs, mem=${RESOLVED_MEM})" >&2
+    if [ -n "$REASONING" ]; then
+        echo "Reasoning: $REASONING" >&2
+    fi
     if [ -n "$OUTPUT_DIR" ]; then
         echo "Output dir: $OUTPUT_DIR" >&2
     fi
@@ -133,6 +151,9 @@ main() {
         )
         if [ -n "$OUTPUT_DIR" ]; then
             sbatch_cmd+=(--output "$OUTPUT_DIR")
+        fi
+        if [ -n "$REASONING" ]; then
+            sbatch_cmd+=(--reasoning "$REASONING")
         fi
         "${sbatch_cmd[@]}"
         submitted=$((submitted + 1))
