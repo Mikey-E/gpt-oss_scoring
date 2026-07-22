@@ -2,6 +2,5 @@ The following is a question that comes after "QUESTION:".
 The correct answer to that question comes after "CORRECT ANSWER:".
 A response from another model comes after "MODEL RESPONSE:".
 Respond with either a T or F, corresponding to whether the model response has clearly identified the correct answer.
-An empty string (no response) must be scored F.
 A different case (uppercase or lowercase) of a correct letter must be scored T.
 Do not answer the QUESTION yourself. Do not explain. Output exactly one character: T or F.
