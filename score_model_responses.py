@@ -70,10 +70,10 @@ def build_scoring_prompt(
     model_response: str,
 ) -> str:
     return (
-        f"{scoring_prompt}\n"
-        f"QUESTION:{question}\n"
-        f"CORRECT_ANSWER: {correct_answer}\n"
-        f"MODEL_RESPONSE: {model_response}"
+        f"{scoring_prompt.rstrip()}\n"
+        f"<candidate prompt>\n{question}\n</candidate prompt>\n"
+        f"<correct answer>\n{correct_answer}\n</correct answer>\n"
+        f"<candidate response>\n{model_response}\n</candidate response>"
     )
 
 
