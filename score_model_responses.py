@@ -137,7 +137,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--max-tokens",
         type=int,
-        default=256,
+        default=512,
         help="Max new tokens per score (includes low reasoning + final T/F).",
     )
     parser.add_argument(
