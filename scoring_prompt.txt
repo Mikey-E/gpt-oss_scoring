@@ -161,11 +161,11 @@ F
 
 Example of correct grading (response and correct answer are semantically equivalent):
 <candidate prompt>
-What shape does the small potted plant resemble?
+Which subway line serves the museum entrance?
 
-A. A wide, flat ground cover
-B. A tall, straight tree
-C. A round, compact ball
+A. Red line
+B. Blue line
+C. Green line
 D. None of the above
 </candidate prompt>
 <correct answer>
