@@ -13,6 +13,8 @@ from pathlib import Path
 SCORING_MODEL_TAG = "oss120"
 DEFAULT_MODEL_PATH = Path(__file__).resolve().parent / "models" / "gpt-oss-120b"
 DEFAULT_PROMPT_PATH = Path(__file__).resolve().parent / "scoring_prompt.txt"
+# Responses longer than this are treated as broken/buggy model output.
+DEFAULT_MAX_RESPONSE_CHARS = 2000
 
 
 def filename_uses_answer_key(path: str | Path) -> bool:
@@ -139,6 +141,15 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=512,
         help="Max new tokens per score (includes low reasoning + final T/F).",
+    )
+    parser.add_argument(
+        "--max-response-chars",
+        type=int,
+        default=DEFAULT_MAX_RESPONSE_CHARS,
+        help=(
+            "Auto-score F without a model call when len(response) exceeds this "
+            f"(default: {DEFAULT_MAX_RESPONSE_CHARS}). Use 0 to disable."
+        ),
     )
     parser.add_argument(
         "--reasoning",
@@ -378,6 +389,16 @@ def main() -> int:
         response = item.get("response", "")
         if response == "":
             print(f"Empty response detected for {point_cloud}, assigning score='F' without model call")
+            data[point_cloud]["score"] = "F"
+            continue
+
+        # Over-long responses are considered broken/buggy model output.
+        max_chars = args.max_response_chars
+        if max_chars > 0 and len(response) > max_chars:
+            print(
+                f"Over-long response ({len(response)}>{max_chars} chars) for "
+                f"{point_cloud}, assigning score='F' without model call"
+            )
             data[point_cloud]["score"] = "F"
             continue
 

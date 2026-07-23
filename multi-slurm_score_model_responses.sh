@@ -6,7 +6,8 @@
 #     --answer_key <answer_key.json> \
 #     [--output <output_dir>] \
 #     [--reasoning low|medium|high] \
-#     [--max-tokens N]
+#     [--max-tokens N] \
+#     [--max-response-chars N]
 #
 # Notes:
 #   - For each *.json file directly inside <directory>, submits one job.
@@ -18,6 +19,7 @@
 #   - --partition accepts a30|l40s|h100 or mb-a30|mb-l40s|mb-h100.
 #   - --reasoning defaults to low if omitted (same as score_model_responses.py).
 #   - --max-tokens defaults to 512 if omitted (same as score_model_responses.py).
+#   - --max-response-chars defaults to 2000 if omitted (0 disables the limit).
 
 set -uo pipefail
 
@@ -35,7 +37,7 @@ die() {
 }
 
 usage() {
-    echo "Usage: $0 <directory> --partition <a30|l40s|h100|mb-*> --answer_key <answer_key.json> [--output <dir>] [--reasoning low|medium|high] [--max-tokens N]" >&2
+    echo "Usage: $0 <directory> --partition <a30|l40s|h100|mb-*> --answer_key <answer_key.json> [--output <dir>] [--reasoning low|medium|high] [--max-tokens N] [--max-response-chars N]" >&2
 }
 
 main() {
@@ -50,6 +52,7 @@ main() {
     local OUTPUT_DIR=""
     local REASONING=""
     local MAX_TOKENS=""
+    local MAX_RESPONSE_CHARS=""
 
     while [ $# -gt 0 ]; do
         case "$1" in
@@ -95,6 +98,17 @@ main() {
                 MAX_TOKENS="$2"
                 shift 2
                 ;;
+            --max-response-chars)
+                [ -n "${2:-}" ] || { die "--max-response-chars requires a non-negative integer"; return 1; }
+                case "$2" in
+                    ''|*[!0-9]*)
+                        die "--max-response-chars must be a non-negative integer (got: $2)"
+                        return 1
+                        ;;
+                esac
+                MAX_RESPONSE_CHARS="$2"
+                shift 2
+                ;;
             -*)
                 die "unknown option: $1"
                 return 1
@@ -135,6 +149,9 @@ main() {
     fi
     if [ -n "$MAX_TOKENS" ]; then
         echo "Max tokens: $MAX_TOKENS" >&2
+    fi
+    if [ -n "$MAX_RESPONSE_CHARS" ]; then
+        echo "Max response chars: $MAX_RESPONSE_CHARS" >&2
     fi
     if [ -n "$OUTPUT_DIR" ]; then
         echo "Output dir: $OUTPUT_DIR" >&2
@@ -178,6 +195,9 @@ main() {
         fi
         if [ -n "$MAX_TOKENS" ]; then
             sbatch_cmd+=(--max-tokens "$MAX_TOKENS")
+        fi
+        if [ -n "$MAX_RESPONSE_CHARS" ]; then
+            sbatch_cmd+=(--max-response-chars "$MAX_RESPONSE_CHARS")
         fi
         "${sbatch_cmd[@]}"
         submitted=$((submitted + 1))
