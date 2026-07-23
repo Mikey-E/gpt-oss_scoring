@@ -4,6 +4,7 @@ The correct answer comes after <correct answer> and before </correct answer>.
 A response from another model comes after <candidate response> and before </candidate response>.
 A different case (uppercase or lowercase) of a correct letter must be scored T.
 If the candidate response is a multiple-choice letter, map that letter to the option text in the candidate prompt, then compare that text to the correct answer.
+If the prompt offers F / none of the above, and the correct answer is not among the listed options, then a candidate response of F or f is correct and must be scored T. Do not confuse the candidate's answer letter F with your grader output F.
 Do not answer the candidate prompt yourself.
 Output exactly one character: T or F.
 
@@ -24,5 +25,25 @@ C
 </candidate response>
 <reasoning>
 The candidate response is "C". In the candidate prompt, C is "Green". The correct answer is "Green". The mapped option text matches the correct answer, so the score is T.
+</reasoning>
+T
+
+Example of correct grading (none-of-the-above / F when correct answer is not listed):
+<candidate prompt>
+What shape is the table in the room?
+
+A. Triangular
+B. Oval
+C. Hexagonal
+If none of the above answers are correct, answer: 'F'
+</candidate prompt>
+<correct answer>
+Cylindrical or square
+</correct answer>
+<candidate response>
+f
+</candidate response>
+<reasoning>
+The candidate response is lowercase "f", which has the same intended meaning as uppercase "F" (none of the above). The correct answer is "Cylindrical or square", which does not appear in options A, B, or C, so none of the above (F) is the correct selection. The candidate chose F/f, so the score is T.
 </reasoning>
 T
