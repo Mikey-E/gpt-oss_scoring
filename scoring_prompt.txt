@@ -70,7 +70,7 @@ F
 
 Example of correct grading (D. None of the above when correct answer is not listed):
 <candidate prompt>
-What instrument is playing the melody in the recording?
+What instrument is there?
 
 A. Violin
 B. Flute
