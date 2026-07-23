@@ -4,7 +4,7 @@ The correct answer comes after <correct answer> and before </correct answer>.
 A response from another model comes after <candidate response> and before </candidate response>.
 A different case (uppercase or lowercase) of a correct letter must be scored T.
 If the candidate response is a multiple-choice letter, map that letter to the option text in the candidate prompt, then compare that text to the correct answer.
-If the prompt offers F / none of the above, and the correct answer is not among the listed options, then a candidate response of F or f is correct and must be scored T. Do not confuse the candidate's answer letter F with your grader output F.
+If the prompt offers F / none of the above (including a lettered option such as D. None of the above), and the correct answer is not among the other listed options, then a candidate response of that none-of-the-above choice (e.g. F, f, or D) is correct and must be scored T. Do not confuse the candidate's answer letter F with your grader output F.
 Do not answer the candidate prompt yourself.
 Output exactly one character: T or F.
 
@@ -67,3 +67,23 @@ C
 The candidate response is "C". In the candidate prompt, C is "Concrete". The correct answer is "Steel". Mapped option text does not match the correct answer, so the score is F.
 </reasoning>
 F
+
+Example of correct grading (D. None of the above when correct answer is not listed):
+<candidate prompt>
+What instrument is playing the melody in the recording?
+
+A. Violin
+B. Flute
+C. Clarinet
+D. None of the above
+</candidate prompt>
+<correct answer>
+Trumpet
+</correct answer>
+<candidate response>
+D
+</candidate response>
+<reasoning>
+The candidate response is "D". In the candidate prompt, D is "None of the above". The correct answer is "Trumpet", which is not among A, B, or C, so none of the above is the correct selection. The candidate chose D, so the score is T.
+</reasoning>
+T
