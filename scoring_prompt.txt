@@ -163,9 +163,9 @@ Example of correct grading (response and correct answer are semantically equival
 <candidate prompt>
 Which subway line serves the museum entrance?
 
-A. Red line
-B. Blue line
-C. Green line
+A. Line 1
+B. Line 2
+C. Line 3
 D. None of the above
 </candidate prompt>
 <correct answer>
