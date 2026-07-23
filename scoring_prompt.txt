@@ -154,9 +154,9 @@ What animal is standing by the fence?
 Goat
 </correct answer>
 <candidate response>
-There is a fence and some grass in the scene. Depending on the lighting one might notice a tractor or a mailbox nearby. It could be a dog running past, or perhaps a horse in the distance; several interpretations are possible.
+There is a fence and some grass in the scene. Depending on the lighting one might notice a tractor or a mailbox nearby. Several interpretations of the overall layout are possible, so it is hard to be sure what stands out most.
 </candidate response>
 <reasoning>
-The correct answer is "Goat". The candidate response is verbose and never clearly commits to an answer; the animals it does mention (dog, horse) are off and it never identifies goat. The score is F.
+The correct answer is "Goat". The candidate response is verbose and never clearly commits to an answer; it discusses the scene but never identifies any animal, let alone goat. The score is F.
 </reasoning>
 F
