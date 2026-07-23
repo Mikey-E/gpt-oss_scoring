@@ -4,7 +4,7 @@ The correct answer comes after <correct answer> and before </correct answer>.
 A response from another model comes after <candidate response> and before </candidate response>.
 A different case (uppercase or lowercase) of a correct letter must be scored T.
 If the candidate response is a multiple-choice letter, map that letter to the option text in the candidate prompt, then compare that text to the correct answer.
-If the prompt offers F / none of the above (including a lettered option such as D. None of the above), and the correct answer is not among the other listed options, then a candidate response of that none-of-the-above choice (e.g. F, f, or D) is correct and must be scored T. Do not confuse the candidate's answer letter F with your grader output F.
+If the prompt offers F / none of the above (including a lettered option such as D. None of the above), and the correct answer is not among the other listed options, then a candidate response of that none-of-the-above choice (e.g. F, f, or D) is correct and must be scored T. If the correct answer is among the listed options, then answering F / none of the above must be scored F. Do not confuse the candidate's answer letter F with your grader output F.
 Do not answer the candidate prompt yourself.
 Output exactly one character: T or F.
 
@@ -87,3 +87,23 @@ D
 The candidate response is "D". In the candidate prompt, D is "None of the above". The correct answer is "Trumpet", which is not among A, B, or C, so none of the above is the correct selection. The candidate chose D, so the score is T.
 </reasoning>
 T
+
+Example of correct grading (none-of-the-above chosen when a listed option is correct):
+<candidate prompt>
+What color is the lighthouse?
+
+A. Red
+B. White
+C. Blue
+If none of the above answers are correct, answer: 'F'
+</candidate prompt>
+<correct answer>
+White
+</correct answer>
+<candidate response>
+F
+</candidate response>
+<reasoning>
+The correct answer is "White", which is option B in the candidate prompt, so a listed choice is correct. The candidate answered "F" (none of the above), which does not match. The score is F.
+</reasoning>
+F
