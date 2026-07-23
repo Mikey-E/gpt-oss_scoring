@@ -139,10 +139,10 @@ What is the roof shape of the barn?
 Gambrel
 </correct answer>
 <candidate response>
-It looks like a peaked or pitched roof, maybe something common on farm buildings.
+The barn looks weathered and wooden, so I would say the roof is flat or maybe corrugated metal sheeting.
 </candidate response>
 <reasoning>
-The correct answer is "Gambrel". The candidate response is on the right track and plausible (it notices a pitched farm-building roof) but does not clearly identify "Gambrel". The score is F.
+The correct answer is "Gambrel". The candidate response discusses the barn and mentions a roof, so it is vaguely on-topic, but the content is off (flat / metal sheeting) and does not clearly identify "Gambrel". The score is F.
 </reasoning>
 F
 
@@ -154,9 +154,9 @@ What animal is standing by the fence?
 Goat
 </correct answer>
 <candidate response>
-Looking at the scene, there is a fence and some grass. Farm animals could include cows, sheep, or goats depending on the viewpoint and lighting. It might be a goat, or possibly a sheep; hard to be sure from the description.
+There is a fence and some grass in the scene. Depending on the lighting one might notice a tractor or a mailbox nearby. It could be a dog running past, or perhaps a horse in the distance; several interpretations are possible.
 </candidate response>
 <reasoning>
-The correct answer is "Goat". The candidate response is verbose and mentions goat among other possibilities, but it does not clearly commit to goat as the answer. The score is F.
+The correct answer is "Goat". The candidate response is verbose and never clearly commits to an answer; the animals it does mention (dog, horse) are off and it never identifies goat. The score is F.
 </reasoning>
 F
