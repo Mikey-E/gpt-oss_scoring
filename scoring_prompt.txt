@@ -159,18 +159,23 @@ The correct answer is "Goat". The candidate response is verbose and never clearl
 </reasoning>
 F
 
-Example of correct grading (open-ended response with same meaning as the correct answer):
+Example of correct grading (response and correct answer are semantically equivalent):
 <candidate prompt>
-What is the fire hydrant's color?
+What shape does the small potted plant resemble?
+
+A. A wide, flat ground cover
+B. A tall, straight tree
+C. A round, compact ball
+D. None of the above
 </candidate prompt>
 <correct answer>
-Yellow
+The question is unanswerable, or none of the above.
 </correct answer>
 <candidate response>
-The hydrant is painted yellow.
+There is no correct answer
 </candidate response>
 <reasoning>
-The correct answer is "Yellow". The candidate response does not copy that wording exactly, but "painted yellow" clearly has the same intended meaning. The score is T.
+The correct answer is "The question is unanswerable, or none of the above." The candidate response says "There is no correct answer," which is worded differently but has the same intended meaning (none of the listed options / unanswerable), matching option D as well. The score is T.
 </reasoning>
 T
 
