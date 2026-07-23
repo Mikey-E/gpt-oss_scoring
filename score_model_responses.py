@@ -139,8 +139,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--max-tokens",
         type=int,
-        default=512,
-        help="Max new tokens per score (includes low reasoning + final T/F).",
+        default=1024,
+        help="Max new tokens per score (includes reasoning + final T/F).",
     )
     parser.add_argument(
         "--max-response-chars",
@@ -154,8 +154,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--reasoning",
         choices=("low", "medium", "high"),
-        default="low",
-        help="gpt-oss reasoning effort (default: low).",
+        default="high",
+        help="gpt-oss reasoning effort (default: high).",
     )
     parser.add_argument(
         "--max-model-len",

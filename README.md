@@ -54,7 +54,7 @@ Optional `--output <dir>` overrides the default output location.
 
 ## Behavior notes
 
-- Reasoning effort defaults to **low**; only the final answer (`T` or `F`) is kept as the score.
+- Reasoning effort defaults to **high**; only the final answer (`T` or `F`) is kept as the score.
 - Decoding is greedy (`temperature=0`).
 - Empty model responses are scored `F` without a model call.
 - `--answer_key` is required. It is applied for filenames ending in `standard.json` or containing `_aad_`, `_iasd_`, or `_oe_solvable`; other files use “unanswerable / none of the above”.

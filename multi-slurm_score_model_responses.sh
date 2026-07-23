@@ -17,8 +17,8 @@
 #     with the unanswerable/none-of-the-above correct answer.
 #   - Non-JSON files are ignored. Subdirectories are not traversed.
 #   - --partition accepts a30|l40s|h100 or mb-a30|mb-l40s|mb-h100.
-#   - --reasoning defaults to low if omitted (same as score_model_responses.py).
-#   - --max-tokens defaults to 512 if omitted (same as score_model_responses.py).
+#   - --reasoning defaults to high if omitted (same as score_model_responses.py).
+#   - --max-tokens defaults to 1024 if omitted (same as score_model_responses.py).
 #   - --max-response-chars defaults to 2000 if omitted (0 disables the limit).
 
 set -uo pipefail
