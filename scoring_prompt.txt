@@ -5,6 +5,8 @@ A response from another model comes after <candidate response> and before </cand
 A different case (uppercase or lowercase) of a correct letter must be scored T.
 If the candidate response is a multiple-choice letter, map that letter to the option text in the candidate prompt, then compare that text to the correct answer.
 If the candidate response uses different wording from the correct answer but clearly has the same intended meaning, score T.
+If the candidate response is only plausible or on the right track but does not clearly identify the correct answer, score F.
+If the candidate response is verbose or rambling and never clearly commits to the correct answer, score F.
 If the prompt offers F / none of the above (including a lettered option such as D. None of the above), and the correct answer is not among the other listed options, then a candidate response of that none-of-the-above choice (e.g. F, f, or D) is correct and must be scored T. If the correct answer is among the listed options, then answering F / none of the above must be scored F. Do not confuse the candidate's answer letter F with your grader output F.
 Do not answer the candidate prompt yourself.
 Output exactly one character: T or F.
@@ -125,6 +127,36 @@ Four
 There are 4 chairs.
 </candidate response>
 <reasoning>
-The correct answer is "Four". The candidate response says "There are 4 chairs," which is worded differently but has the same intended meaning as "Four" (and matches option B). The score is T.
+The correct answer is "Four". The candidate response says "There are 4 chairs," which is worded differently but has the same general meaning as "Four" (and matches option B). The score is T.
 </reasoning>
 T
+
+Example of correct grading (plausible near-miss that does not clearly identify the correct answer):
+<candidate prompt>
+What is the roof shape of the barn?
+</candidate prompt>
+<correct answer>
+Gambrel
+</correct answer>
+<candidate response>
+It looks like a peaked or pitched roof, maybe something common on farm buildings.
+</candidate response>
+<reasoning>
+The correct answer is "Gambrel". The candidate response is on the right track and plausible (it notices a pitched farm-building roof) but does not clearly identify "Gambrel". The score is F.
+</reasoning>
+F
+
+Example of correct grading (verbose response that never clearly commits):
+<candidate prompt>
+What animal is standing by the fence?
+</candidate prompt>
+<correct answer>
+Goat
+</correct answer>
+<candidate response>
+Looking at the scene, there is a fence and some grass. Farm animals could include cows, sheep, or goats depending on the viewpoint and lighting. It might be a goat, or possibly a sheep; hard to be sure from the description.
+</candidate response>
+<reasoning>
+The correct answer is "Goat". The candidate response is verbose and mentions goat among other possibilities, but it does not clearly commit to goat as the answer. The score is F.
+</reasoning>
+F
