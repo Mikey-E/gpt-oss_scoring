@@ -3,5 +3,26 @@ The candidate prompt comes after <candidate prompt> and before </candidate promp
 The correct answer comes after <correct answer> and before </correct answer>.
 A response from another model comes after <candidate response> and before </candidate response>.
 A different case (uppercase or lowercase) of a correct letter must be scored T.
-Do not answer the candidate prompt yourself. Do not explain.
+If the candidate response is a multiple-choice letter, map that letter to the option text in the candidate prompt, then compare that text to the correct answer.
+Do not answer the candidate prompt yourself.
 Output exactly one character: T or F.
+
+Example of correct grading (letter response matched to option text):
+<candidate prompt>
+What color are the leaves of the potted succulent?
+
+A. Red
+B. Yellow
+C. Green
+D. Blue
+</candidate prompt>
+<correct answer>
+Green
+</correct answer>
+<candidate response>
+C
+</candidate response>
+<reasoning>
+The candidate response is "C". In the candidate prompt, C is "Green". The correct answer is "Green". The mapped option text matches the correct answer, so the score is T.
+</reasoning>
+T
