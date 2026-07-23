@@ -4,6 +4,7 @@ The correct answer comes after <correct answer> and before </correct answer>.
 A response from another model comes after <candidate response> and before </candidate response>.
 A different case (uppercase or lowercase) of a correct letter must be scored T.
 If the candidate response is a multiple-choice letter, map that letter to the option text in the candidate prompt, then compare that text to the correct answer.
+If the candidate response uses different wording from the correct answer but clearly has the same intended meaning, score T.
 If the prompt offers F / none of the above (including a lettered option such as D. None of the above), and the correct answer is not among the other listed options, then a candidate response of that none-of-the-above choice (e.g. F, f, or D) is correct and must be scored T. If the correct answer is among the listed options, then answering F / none of the above must be scored F. Do not confuse the candidate's answer letter F with your grader output F.
 Do not answer the candidate prompt yourself.
 Output exactly one character: T or F.
@@ -107,3 +108,23 @@ F
 The correct answer is "White", which is option B in the candidate prompt, so a listed choice is correct. The candidate answered "F" (none of the above), which does not match. The score is F.
 </reasoning>
 F
+
+Example of correct grading (different wording, same intended meaning scored T):
+<candidate prompt>
+How many chairs are around the dining table?
+
+A. Two
+B. Four
+C. Six
+D. Eight
+</candidate prompt>
+<correct answer>
+Four
+</correct answer>
+<candidate response>
+There are 4 chairs.
+</candidate response>
+<reasoning>
+The correct answer is "Four". The candidate response says "There are 4 chairs," which is worded differently but has the same intended meaning as "Four" (and matches option B). The score is T.
+</reasoning>
+T
