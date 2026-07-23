@@ -5,7 +5,8 @@
 #     --partition h100 \
 #     --answer_key <answer_key.json> \
 #     [--output <output_dir>] \
-#     [--reasoning low|medium|high]
+#     [--reasoning low|medium|high] \
+#     [--max-tokens N]
 #
 # Notes:
 #   - For each *.json file directly inside <directory>, submits one job.
@@ -16,6 +17,7 @@
 #   - Non-JSON files are ignored. Subdirectories are not traversed.
 #   - --partition accepts a30|l40s|h100 or mb-a30|mb-l40s|mb-h100.
 #   - --reasoning defaults to low if omitted (same as score_model_responses.py).
+#   - --max-tokens defaults to 512 if omitted (same as score_model_responses.py).
 
 set -uo pipefail
 
@@ -33,7 +35,7 @@ die() {
 }
 
 usage() {
-    echo "Usage: $0 <directory> --partition <a30|l40s|h100|mb-*> --answer_key <answer_key.json> [--output <dir>] [--reasoning low|medium|high]" >&2
+    echo "Usage: $0 <directory> --partition <a30|l40s|h100|mb-*> --answer_key <answer_key.json> [--output <dir>] [--reasoning low|medium|high] [--max-tokens N]" >&2
 }
 
 main() {
@@ -47,6 +49,7 @@ main() {
     local PARTITION_ARG=""
     local OUTPUT_DIR=""
     local REASONING=""
+    local MAX_TOKENS=""
 
     while [ $# -gt 0 ]; do
         case "$1" in
@@ -75,6 +78,21 @@ main() {
                         ;;
                 esac
                 REASONING="$2"
+                shift 2
+                ;;
+            --max-tokens)
+                [ -n "${2:-}" ] || { die "--max-tokens requires a positive integer"; return 1; }
+                case "$2" in
+                    ''|*[!0-9]*)
+                        die "--max-tokens must be a positive integer (got: $2)"
+                        return 1
+                        ;;
+                esac
+                if [ "$2" -lt 1 ]; then
+                    die "--max-tokens must be a positive integer (got: $2)"
+                    return 1
+                fi
+                MAX_TOKENS="$2"
                 shift 2
                 ;;
             -*)
@@ -115,6 +133,9 @@ main() {
     if [ -n "$REASONING" ]; then
         echo "Reasoning: $REASONING" >&2
     fi
+    if [ -n "$MAX_TOKENS" ]; then
+        echo "Max tokens: $MAX_TOKENS" >&2
+    fi
     if [ -n "$OUTPUT_DIR" ]; then
         echo "Output dir: $OUTPUT_DIR" >&2
     fi
@@ -154,6 +175,9 @@ main() {
         fi
         if [ -n "$REASONING" ]; then
             sbatch_cmd+=(--reasoning "$REASONING")
+        fi
+        if [ -n "$MAX_TOKENS" ]; then
+            sbatch_cmd+=(--max-tokens "$MAX_TOKENS")
         fi
         "${sbatch_cmd[@]}"
         submitted=$((submitted + 1))
