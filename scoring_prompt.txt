@@ -93,76 +93,6 @@ The correct answer is "White", which is option B in the candidate prompt, so a l
 </reasoning>
 F
 
-Example of correct grading (D. None of the above when correct answer is not listed):
-<candidate prompt>
-What instrument is there?
-
-A. Violin
-B. Flute
-C. Clarinet
-D. None of the above
-</candidate prompt>
-<correct answer>
-Trumpet
-</correct answer>
-<candidate response>
-D
-</candidate response>
-<reasoning>
-The candidate response is "D". In the candidate prompt, D is "None of the above". The correct answer is "Trumpet", which is not among A, B, or C, so none of the above is the correct selection. The candidate chose D, so the score is T.
-</reasoning>
-T
-
-Example of correct grading (plausible near-miss that does not clearly identify the correct answer):
-<candidate prompt>
-What is the roof shape of the barn?
-</candidate prompt>
-<correct answer>
-Gambrel
-</correct answer>
-<candidate response>
-The barn looks weathered and wooden, so I would say the roof is flat or maybe corrugated metal sheeting.
-</candidate response>
-<reasoning>
-The correct answer is "Gambrel". The candidate response discusses the barn and mentions a roof, so it is vaguely on-topic, but the content is off (flat / metal sheeting) and does not clearly identify "Gambrel". The score is F.
-</reasoning>
-F
-
-Example of correct grading (different wording, same intended meaning scored T):
-<candidate prompt>
-How many chairs are around the dining table?
-
-A. Two
-B. Four
-C. Six
-D. Eight
-</candidate prompt>
-<correct answer>
-Four
-</correct answer>
-<candidate response>
-There are 4 chairs.
-</candidate response>
-<reasoning>
-The correct answer is "Four". The candidate response says "There are 4 chairs," which is worded differently but has the same general meaning as "Four" (and matches option B). The score is T.
-</reasoning>
-T
-
-Example of correct grading (verbose response that never clearly commits):
-<candidate prompt>
-What animal is standing by the fence?
-</candidate prompt>
-<correct answer>
-Goat
-</correct answer>
-<candidate response>
-There is a fence and some grass in the scene. Depending on the lighting one might notice a tractor or a mailbox nearby. Several interpretations of the overall layout are possible, so it is hard to be sure what stands out most.
-</candidate response>
-<reasoning>
-The correct answer is "Goat". The candidate response is verbose and never clearly commits to an answer; it discusses the scene but never identifies any animal, let alone goat. The score is F.
-</reasoning>
-F
-
 Example of correct grading (correct answer is unanswerable / none of the above):
 <candidate prompt>
 What brand is the microwave on the counter?
@@ -183,6 +113,21 @@ E
 The correct answer states that the question is unanswerable, or none of the above. In the candidate prompt, E is "None of the above". The candidate selected E, which matches that correct choice, so the score is T.
 </reasoning>
 T
+
+Example of correct grading (plausible near-miss that does not clearly identify the correct answer):
+<candidate prompt>
+What is the roof shape of the barn?
+</candidate prompt>
+<correct answer>
+Gambrel
+</correct answer>
+<candidate response>
+The barn looks weathered and wooden, so I would say the roof is flat or maybe corrugated metal sheeting.
+</candidate response>
+<reasoning>
+The correct answer is "Gambrel". The candidate response discusses the barn and mentions a roof, so it is vaguely on-topic, but the content is off (flat / metal sheeting) and does not clearly identify "Gambrel". The score is F.
+</reasoning>
+F
 
 Example of correct grading (messy format that still clearly commits to the correct answer):
 <candidate prompt>
@@ -206,6 +151,21 @@ The candidate response includes extra prose, but it clearly commits to "Answer: 
 </reasoning>
 T
 
+Example of correct grading (verbose response that never clearly commits):
+<candidate prompt>
+What animal is standing by the fence?
+</candidate prompt>
+<correct answer>
+Goat
+</correct answer>
+<candidate response>
+There is a fence and some grass in the scene. Depending on the lighting one might notice a tractor or a mailbox nearby. Several interpretations of the overall layout are possible, so it is hard to be sure what stands out most.
+</candidate response>
+<reasoning>
+The correct answer is "Goat". The candidate response is verbose and never clearly commits to an answer; it discusses the scene but never identifies any animal, let alone goat. The score is F.
+</reasoning>
+F
+
 Example of correct grading (open-ended response with same meaning as the correct answer):
 <candidate prompt>
 What is the fire hydrant's color?
@@ -220,3 +180,23 @@ The hydrant is painted yellow.
 The correct answer is "Yellow". The candidate response does not copy that wording exactly, but "painted yellow" clearly has the same intended meaning. The score is T.
 </reasoning>
 T
+
+Example of correct grading (different wording that does not match the correct answer):
+<candidate prompt>
+How many chairs are around the dining table?
+
+A. Two
+B. Four
+C. Six
+D. Eight
+</candidate prompt>
+<correct answer>
+Four
+</correct answer>
+<candidate response>
+There are 6 chairs.
+</candidate response>
+<reasoning>
+The correct answer is "Four". The candidate response says "There are 6 chairs," which is worded as a full sentence but means six, not four. Different wording does not help when the intended meaning is wrong, so the score is F.
+</reasoning>
+F
