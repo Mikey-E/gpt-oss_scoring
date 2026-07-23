@@ -13,8 +13,10 @@
 #   - For each *.json file directly inside <directory>, submits one job.
 #   - An answer key must always be provided via --answer_key. It is passed to
 #     all jobs; scoring uses it for filenames ending in "standard.json" or
-#     containing "_aad_", "_iasd_", or "_oe_solvable". Other files still score
-#     with the unanswerable/none-of-the-above correct answer.
+#     containing "_aad_", "_iasd_", or "_oe_solvable". For _aad_/_iasd_ (all
+#     variants), the correct answer is "none of the above, or <answer key>".
+#     Other files still score with the unanswerable/none-of-the-above correct
+#     answer.
 #   - Non-JSON files are ignored. Subdirectories are not traversed.
 #   - --partition accepts a30|l40s|h100 or mb-a30|mb-l40s|mb-h100.
 #   - --reasoning defaults to high if omitted (same as score_model_responses.py).

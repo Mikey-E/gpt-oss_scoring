@@ -28,6 +28,31 @@ def filename_uses_answer_key(path: str | Path) -> bool:
     )
 
 
+def filename_is_aad_or_iasd(path: str | Path) -> bool:
+    """AAD/IASD (all variants): correct answer is none-of-the-above OR the key answer."""
+    name = os.path.basename(str(path))
+    return "_aad_" in name or "_iasd_" in name
+
+
+def resolve_correct_answer(
+    path: str | Path,
+    point_cloud: str,
+    answer_key: dict,
+    use_answer_key: bool,
+) -> str:
+    """Build the <correct answer> string for scoring and scored JSON."""
+    if use_answer_key and point_cloud in answer_key:
+        key_answer = answer_key[point_cloud]
+        if filename_is_aad_or_iasd(path):
+            # Accept either none-of-the-above / unanswerable, or the keyed answer.
+            return (
+                "There is no correct answer / none of the above, or "
+                f"{key_answer}"
+            )
+        return key_answer
+    return "The question is unanswerable, or none of the above."
+
+
 def extract_final_answer(completion: str) -> str:
     """Extract the gpt-oss final channel, falling back to raw text."""
     marker = "<|channel|>final<|message|>"
@@ -380,10 +405,9 @@ def main() -> int:
 
     for point_cloud in point_clouds:
         item = data[point_cloud]
-        if use_answer_key and point_cloud in answer_key:
-            correct_answer = answer_key[point_cloud]
-        else:
-            correct_answer = "The question is unanswerable, or none of the above."
+        correct_answer = resolve_correct_answer(
+            json_file, point_cloud, answer_key, use_answer_key
+        )
         data[point_cloud]["correct_answer"] = correct_answer
 
         response = item.get("response", "")

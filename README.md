@@ -57,7 +57,7 @@ Optional `--output <dir>` overrides the default output location.
 - Reasoning effort defaults to **high**; only the final answer (`T` or `F`) is kept as the score.
 - Decoding is greedy (`temperature=0`).
 - Empty model responses are scored `F` without a model call.
-- `--answer_key` is required. It is applied for filenames ending in `standard.json` or containing `_aad_`, `_iasd_`, or `_oe_solvable`; other files use “unanswerable / none of the above”.
+- `--answer_key` is required. It is applied for filenames ending in `standard.json` or containing `_aad_`, `_iasd_`, or `_oe_solvable`. For `_aad_` / `_iasd_` (base, additional_option, additional_instruction), the graded correct answer is `There is no correct answer / none of the above, or <answer key>`. Other files use “unanswerable / none of the above”.
 - Invalid non-`T`/`F` outputs fail the job and write `FAILED_*_oss120_scored.json`. Retries are not used under greedy decoding (`temperature=0`), since they would repeat the same tokens.
 - vLLM memory knobs auto-tune by GPU size (A30 is tight for 120B): lower `max_num_seqs` / `max_model_len`, and `enforce_eager` on ≤24GB GPUs. Override with `--max-num-seqs`, `--max-model-len`, `--gpu-memory-utilization`, `--enforce-eager` / `--no-enforce-eager`.
 - Logs: `./slurm_logs/score_oss120_<jobid>.out`
