@@ -47,3 +47,23 @@ f
 The candidate response is lowercase "f", which has the same intended meaning as uppercase "F" (none of the above). The correct answer is "Cylindrical or square", which does not appear in options A, B, or C, so none of the above (F) is the correct selection. The candidate chose F/f, so the score is T.
 </reasoning>
 T
+
+Example of correct grading (wrong multiple-choice letter scored F):
+<candidate prompt>
+What material is the pedestrian bridge deck made of?
+
+A. Timber
+B. Steel
+C. Concrete
+D. Glass
+</candidate prompt>
+<correct answer>
+Steel
+</correct answer>
+<candidate response>
+C
+</candidate response>
+<reasoning>
+The candidate response is "C". In the candidate prompt, C is "Concrete". The correct answer is "Steel". Mapped option text does not match the correct answer, so the score is F.
+</reasoning>
+F
